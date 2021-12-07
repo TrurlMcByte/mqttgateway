@@ -48,6 +48,11 @@ func newMQTTExporter() *mqttExporter {
 	if *clientID != "" {
 		options.SetClientID(*clientID)
 	}
+	options.ConnectRetry = true
+	options.AutoReconnect = true
+	options.OnReconnecting = func(mqtt.Client, *mqtt.ClientOptions) {
+		log.Warnf("attempting to reconnect", t)
+	}	
 	m := mqtt.NewClient(options)
 	if token := m.Connect(); token.Wait() && token.Error() != nil {
 		log.Fatal(token.Error())
